@@ -1,27 +1,43 @@
-import { useEffect } from "react";
 import { Container } from "semantic-ui-react";
 import Navbar from "./Navbar";
-import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
-import LoadingComponent from "./LoadingComponent";
-import { useStore } from "../stores/store";
 import { observer } from "mobx-react-lite";
+import Homepage from "../../features/activities/home/Homepage";
+import { Route, Routes, useLocation } from "react-router-dom";
+import ActivityForm from "../../features/activities/form/ActivityForm";
+import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
+import ActivityDetails from "../../features/activities/dashboard/details/ActivityDetails";
 
 function App() {
-  const { activityStore } = useStore();
-
-  useEffect(() => {
-    activityStore.loadActivities();
-  }, [activityStore]);
-
-  if (activityStore.loadingInitial)
-    return <LoadingComponent content="Loading app..." />;
-
+  const location = useLocation();
   return (
     <>
-      <Navbar />
-      <Container style={{ marginTop: "7em" }}>
-        <ActivityDashboard />
-      </Container>
+      <Routes>
+        <Route path={"/"} element={<Homepage />} />
+        <Route
+          path={"/*"}
+          element={
+            <>
+              {" "}
+              <Navbar />
+              <Container style={{ marginTop: "7em" }}>
+                <Routes>
+                  <Route path="/" element={<Homepage />} />
+                  <Route path="/activities" element={<ActivityDashboard />} />
+                  <Route path="/activities/:id" element={<ActivityDetails />} />
+                  <Route
+                    path="/createActivity"
+                    element={<ActivityForm key={location.key} />}
+                  />
+                  <Route
+                    path="/manage/:id"
+                    element={<ActivityForm key={location.key} />}
+                  />
+                </Routes>
+              </Container>
+            </>
+          }
+        />
+      </Routes>
     </>
   );
 }
